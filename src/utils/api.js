@@ -3,13 +3,15 @@ import * as request from 'request-promise'
 
 /* FREE JSON API EXAMPLE */
 
-/* NEWS: https://newsapi.org/ */
+/*  https://newsapi.org/ */
 
-export const NEWS_API_KEY = 'YOUR_KEY_HERE'
+export const API_KEY = 'c65fba81d10cadd467342db86fd033d6';
+;
 
 export const ENDPOINTS = {
 
-    NEWS_API_URL: 'https://newsapi.org/v1/articles'
+    //API_URL: "https://api.themoviedb.org/3/movie/${movieID}?&api_key=c65fba81d10cadd467342db86fd033d6"
+    API_URL: "https://api.themoviedb.org/3/search/movie?api_key={c65fba81d10cadd467342db86fd033d6}"
 
 }
 
@@ -26,3 +28,5 @@ export function get( url, queryParameters ) {
         qs: queryParameters
     } )
 }
+
+
