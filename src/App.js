@@ -1,128 +1,123 @@
-/* ROOT Component of your App  */
+import React, { Component } from 'react';
+import SearchBox from './components/search';
+import Card from './components/card';
 
-import React, { Component } from 'react'
-import logo from './logo.svg'
-import './App.css'
-import PersonnageCard from './components/PersonnageCard'
 
-//import defaultPicture from './components/img/default.jpg'
-
-const Materialize = window.Materialize
-
-const APP_TITLE = 'Movie App'
-//update document title (displayed in the opened browser tab)
-document.title = APP_TITLE
-
-//web api utils
-import { get, ENDPOINTS, API_KEY } from './utils/api'
-
-//components
 class App extends Component {
-
-    /* React state initialization DOCUMENTATION : https://facebook.github.io/react/docs/react-without-es6.html#setting-the-initial-state */
 
     constructor( props ) {
         super( props )
+
         this.state = {
-            movie: undefined,
-            personnage: ''
+            movieID: 118340 //  set initital load movie - Les Gardiens de la Galaxie
         }
     }
 
 
     render() {
         return (
-            <div className="App">
-                <div className="App-header">
-                    <h1>{ APP_TITLE }</h1>
-                    <img src={ logo } className="App-logo" alt="logo" />
-                </div>
+            <div>
+                <SearchBox fetchMovieID={ this.fetchMovieID.bind( this ) } />
+                <Card data={ this.state } />
 
-                <div className="App-Input-content">
-                    <label style={ { fontSize: 22 } }>
-                        Enter the name of artist:
-                    </label>
-                    <input type='text' style={ { paddingLeft: 20 } } value={ this.state.personnage } onChange={ this.handleChange } />
-                </div>
-                <div className="App-content">
-                    <div className="center-align">
+            </div> )
 
-                        <form onSubmit={ this.fetchPersonnage }>
-                            <button type="submit" className="waves-effect waves-light btn btn-search">
-                                Search
-                            </button>
-                        </form>
-                    </div>
+    } // END render
 
-                    <div className="row" style={ { marginTop: 20 } } >
-                        { this.displayMovie() }
-                    </div>
-                </div>
-            </div>
-        )
-    }
 
-    handleChange = ( event ) => {
-        this.setState( {
-            personnage: event.target.value
-        } )
-    }
 
-    //method triggered by onSubmit event of the form or by onClick event of the "Get some marvel!" button
-    /* Arrow function syntax used for Autobinding, see details here : https://facebook.github.io/react/docs/react-without-es6.html#autobinding */
-    fetchPersonnage = async ( event ) => {
+    // the api request function
+    fetchApi( url ) {
 
-        event.preventDefault()
-
-        /* ASYNC - AWAIT DOCUMENTATION : https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/await */
-
-        try {
-            const movie = await get( ENDPOINTS.API_URL, {
-                //YOU NEED TO PROVIDE YOUR "APIXU" API KEY HERE, see /utils/api.js file to grab the DOCUMENTATION file
-                apikey: API_KEY,
-                name: this.state.personnage
-            } )
-
-            console.log( movie )
-
+        fetch( url ).then(( res ) => res.json() ).then(( data ) => {
+            // update state with API data
             this.setState( {
-                movie: movie
+                movieID: data.id,
+                original_title: data.original_title,
+                tagline: data.tagline,
+                overview: data.overview,
+                homepage: data.homepage,
+                production: data.production_companies,
+                production_countries: data.production_countries,
+                genre: data.genres,
+                release: data.release_date,
+                vote: data.vote_average,
+                runtime: data.runtime,
+                revenue: data.revenue,
+                backdrop: data.backdrop_path
+
             } )
+        } )
 
-        }
-        catch ( error ) {
-            Materialize.toast( error, 8000, 'error-toast' )
-            console.log( 'Failed fetching data: ', error )
-        }
+
+    } // end function
+
+    fetchMovieID( movieID ) {
+        let url = `https://api.themoviedb.org/3/movie/${ movieID }?&api_key=c65fba81d10cadd467342db86fd033d6`
+        this.fetchApi( url )
+    } // end function
+
+    componentDidMount() {
+        let url = `https://api.themoviedb.org/3/movie/${ this.state.movieID }?&api_key=c65fba81d10cadd467342db86fd033d6`
+        this.fetchApi( url )
 
     }
 
 
-    //handle display of the received marvel object
-    displayMovie = () => {
-        if ( this.state.movie ) {
-            const characters = this.state.movie.data.results
 
-            return characters.map(
-                function ( character ) {
-                    return <PersonnageCard key={ character.name }
-                        title={ character.name }
-                        text={ character.description }
-                        urlImg={ character.thumbnail.path + "/portrait_xlarge." + character.thumbnail.extension }
-                        url={ character.urls[ 0 ].url }
+    /* displayMovie( movies ) {
+ 
+         if ( this.state.movieID ) {
+             const movies = this.state.movieID.data.results
+ 
+             return movies.map(
+                 movies.results, function ( movie ) {
+                     // Map the remote source JSON array to a JavaScript object array
+                     return {
+ 
+                         value: movie.original_title, // search original title
+                         id: movie.id // get ID of movie simultaniously
+                     };
+                 } );
+ 
+ 
+ 
+             return null
+         }
+ 
+         // end component did mount function
+     }
+ */
+}   // END CLASS - APP
+
+module.exports = App;
 
 
 
-                    />
-                }
-            )
-        }
 
 
 
-        return null
-    }
 
-}
 
-export default App
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
